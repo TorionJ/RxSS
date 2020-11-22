@@ -9,7 +9,6 @@ describe 'RxSS API', type: :request do
 
   context 'when the endpoint has the latitude and longitude properly formatted' do
     it 'returns the closest pharmacy and a status code of 200' do
-
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)).to include("name","address","miles")
     end
