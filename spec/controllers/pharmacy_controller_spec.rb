@@ -18,7 +18,7 @@ describe 'RxSS API', type: :request do
     let(:lat_lon) { '39;0036-94;4634' }
     let(:error) { 'coordinates must be digits with a %3B after the second digit, and separated with a comma' }
 
-    it 'returns an error and a status of bad request' do
+    it 'returns an error and a status code of 400' do
       expect(response).to have_http_status(:bad_request)
       expect(JSON.parse(response.body)["error"]).to eq(error)
     end
@@ -30,7 +30,7 @@ describe 'RxSS API', type: :request do
     context 'when latitude does not have a semi colon' do
       let(:lat_lon) { '390036,-94;4634' }
 
-      it 'returns an error and a status of bad request' do
+      it 'returns an error and a status code of 400' do
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body)["error"]).to eq(error)
       end
@@ -39,7 +39,7 @@ describe 'RxSS API', type: :request do
     context 'when longitude does not have a semi colon' do
       let(:lat_lon) { '39;0036,-944634' }
 
-      it 'should return an error with a status bad request' do
+      it 'returns an error and a status code of 400' do
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body)["error"]).to eq(error)
       end
