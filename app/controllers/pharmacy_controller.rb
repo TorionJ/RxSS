@@ -2,10 +2,20 @@ require 'csv'
 
 class PharmacyController < ApplicationController
   def show
+    if !params[:latlon].include?(',')
+      return render json: { error:
+        'coordinates must be digits with a %3B after the second digit, and separated with a comma'
+        }, status: :bad_request
+    end
     # prepping the latitude & longitude for the closest_pharma function.
     lat_lon_arr = params[:latlon].split(',')
     lat,lon = lat_lon_arr
+
     # replacing the semi colons with periods.
+    if !lat.include?(';') || !lon.include?(';')
+      return render json: { error: 'Latitude and Longitude decimal must be replaced with %3B'}, status: :bad_request
+    end
+
     lat[";"] = '.'
     lon[";"] = '.'
 
@@ -21,7 +31,7 @@ class PharmacyController < ApplicationController
     # @param lat_lon_array => is an array of floats containing the user's coordinates.
     # Geocoder::Calculations.distance_between(pointA, pointB) returns the miles between point A and point B.
     # returns a JSON object with properties => name:string, address:string, miles:float.
-    miles = 0
+    miles = -1
     name, address = "", ""
 
     # pharmas => is an array of arrays containing each store's information.
@@ -30,11 +40,13 @@ class PharmacyController < ApplicationController
     pharmas.slice!(0)
 
     pharmas.each do |pharmacy|
-      if miles.zero?
+      if miles < 0
         miles = Geocoder::Calculations.distance_between(lat_lon_array, [pharmacy[5].to_f, pharmacy[6].to_f])
         name = pharmacy[0]
         address = "#{pharmacy[1]}, #{pharmacy[2]}, #{pharmacy[3]} #{pharmacy[4]}"
-      else
+      end
+
+      if miles
         potential_closest_mi = Geocoder::Calculations.distance_between(lat_lon_array, [pharmacy[5].to_f, pharmacy[6].to_f])
         if miles > potential_closest_mi
           miles = potential_closest_mi
@@ -44,6 +56,6 @@ class PharmacyController < ApplicationController
       end
     end
 
-    { name: name.strip, address: address, miles: miles }
+    { name: name.strip, address: address, miles: miles.round(2) }
   end
 end
