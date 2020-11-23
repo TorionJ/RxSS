@@ -3,8 +3,7 @@ require 'csv'
 class Coordinate < ApplicationRecord
   attr_accessor :latitude, :longitude
 
-  validates :latitude, :longitude, presence: true
-  validates :latitude, :longitude, numericality: true
+  validates :latitude, :longitude, presence: true, numericality: true
 
 
   def get_closest_pharma
