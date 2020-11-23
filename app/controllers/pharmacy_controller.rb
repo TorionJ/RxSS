@@ -2,22 +2,13 @@ require 'csv'
 
 class PharmacyController < ApplicationController
   def show
-    if !params[:latlon].include?(',')
-      return render json: { error:
-        'coordinates must be digits with a %3B after the second digit, and separated with a comma'
-        }, status: :bad_request
-    end
-    # prepping the latitude & longitude for the closest_pharma function.
-    lat_lon_arr = params[:latlon].split(',')
-    lat,lon = lat_lon_arr
-
-    # replacing the semi colons with periods.
-    if !lat.include?(';') || !lon.include?(';')
+    # replacing the semi colons with decimals.
+    if !params[:lat].include?(';') || !params[:lon].include?(';')
       return render json: { error: 'Latitude and Longitude decimal must be replaced with %3B'}, status: :bad_request
     end
 
-    lat[";"] = '.'
-    lon[";"] = '.'
+    lat,lon = params[:lat], params[:lon]
+    lat[";"],lon[";"] = '.','.'
 
     # returns a JSON of the closest pharmacy with properties: name, address, and miles.
     #  to_f => converts srings to a float.
